@@ -1,8 +1,3 @@
-"""
-TODO: fix a weird glitch at the snow HL, there's a white flashing that shift everything
-    Check that new pause_time doesn't screw the fake loading counters
-"""
-
 # from PyQt5 import QtGui, QtCore, QtTest
 from PyQt5.QtWidgets import QMainWindow, QApplication, QWidget, QMessageBox, QFileDialog
 from PyQt5 import QtCore, QtGui
@@ -172,7 +167,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
     # FUNCTIONS
 
     def viewHelp(self):
-        os.system("start \"\" https://github.com/Toufool/Auto-Split#tutorial")
+        os.system("start \"\" https://github.com/robincherix/AutoSplitterJourney")
         return
 
     def about(self):
@@ -838,13 +833,13 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         # Current level 
         self.current_level = Level.CHAPTER_SELECT
 
-        self.pause_time = 5
+        self.pause_time = 2
 
 
         # Fake loading screen counter
         self.fake_loading_counter = 0
 
-        self.similarity_threshold = 0.95
+        self.similarity_threshold = 0.995
 
         # error checking:
         if self.splitimagefolderLineEdit.text() == 'No Folder Selected':
