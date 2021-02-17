@@ -1,3 +1,6 @@
 /src/build
-
+/venv
 /src/dist
+/dist
+/build
+requirements_old.txt
