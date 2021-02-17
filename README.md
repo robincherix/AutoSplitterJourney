@@ -23,7 +23,7 @@ For a whole run you should have 7 split images.
 
 4. Set up the Start / Split and Pause hotkeys (same as your speedrun timer). 
 
-5. Set up the checkboxes on the bottom left of the window. These checkboxes indicate whether or not the runner watch history lessons. 
+5. Set up the checkboxes on the bottom left of the window. These checkboxes indicate whether or not the runner watches history lessons. 
 One extra checkbox indicates if the runner uses a zen jump to fast drop at the end of Sunken City.
 
 6. Start the timer as you normally would using your timer hotkeys.
