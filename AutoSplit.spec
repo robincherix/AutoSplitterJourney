@@ -3,8 +3,8 @@
 block_cipher = None
 
 
-a = Analysis(['AutoSplit.py'],
-             pathex=['C:\\Users\\Robin\\Desktop\\Auto-Split-master\\Auto-Split-master\\src'],
+a = Analysis(['src\\AutoSplit.py'],
+             pathex=['C:\\Users\\Robin\\Desktop\\Auto-Split-master\\Auto-Split-master'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -30,4 +30,4 @@ exe = EXE(pyz,
           upx=True,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=True , icon='..\\icon.ico')
+          console=False , icon='icon.ico')
