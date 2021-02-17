@@ -18,9 +18,7 @@ I take no credits for this work, as 95% of the code comes from this project.
 
 3. Create the split images by taking screenshots of the selected region (Take Screenshot button will automatically do that for you) at the transition between levels.
 These transitions are either white or black.
-
 /!\ Make sure the player interface (Youtube, Twitch, ...) isn't up when taking the screenshots, as it can mess with the image recognition used by the program. 
-
 For a whole run you should have 7 split images.
 
 4. Set up the Start / Split and Pause hotkeys (same as your speedrun timer). 
