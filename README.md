@@ -11,6 +11,27 @@ I take no credits for this work, as 95% of the code comes from this project.
 
 # TUTORIAL
 
+## How to time a run
+1. Select the region where the run is displayed.
+
+2. Select the split images folder
+
+3. Create the split images by taking screenshots of the selected region (Take Screenshot button will automatically do that for you) at the transition between levels.
+These transitions are either white or black.
+
+/!\ Make sure the player interface (Youtube, Twitch, ...) isn't up when taking the screenshots, as it can mess with the image recognition used by the program. 
+
+For a whole run you should have 7 split images.
+
+4. Set up the Start / Split and Pause hotkeys (same as your speedrun timer). 
+
+5. Set up the checkboxes on the bottom left of the window. These checkboxes indicate whether or not the runner watch history lessons. 
+One extra checkbox indicates if the runner uses a zen jump to fast drop at the end of Sunken City.
+
+6. Start the timer as you normally would using your timer hotkeys.
+
+7. At the end of the run, split one last time as you normally would using your timer hotkeys to stop the timer.
+
 ## DOWNLOAD AND OPEN
 
 ### Compatability
@@ -25,7 +46,6 @@ I take no credits for this work, as 95% of the code comes from this project.
 - Images can be any size.
 - Images are matched in alphanumerical order.
 - Recommended filenaming convention: `001_SplitName.png, 002_SplitName.png, 003_SplitName.png`... 
-- Custom split image settings are handled in the filename. See how [here](https://github.com/Toufool/Auto-Split#custom-split-image-settings).
 - Images can be created using Print Screen, [Snipping Tool](https://support.microsoft.com/en-us/help/4027213/windows-10-open-snipping-tool-and-take-a-screenshot), or AutoSplit's Take Screenshot button.
 
 ## Capture Region
