@@ -789,7 +789,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         self.hl_sunken_city = self.hl_sunken_city_checkbox.isChecked()
         self.hl_underground = self.hl_underground_checkbox.isChecked()
         self.hl_tower = self.hl_tower_checkbox.isChecked()
-        self.hl_snow = True
+        self.hl_snow = self.hl_snow_checkbox.isChecked()
         self.hl_paradise = True
 
         self.hl_array = [
@@ -1090,7 +1090,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 else:
                     if self.waiting_for_split_delay == False and self.similarity >= self.similarity_threshold:
                         break
-                        
+
                 # limit the number of time the comparison runs to reduce cpu usage
                 fps_limit = self.fpslimitSpinBox.value()
                 time.sleep((1 / fps_limit) - (time.time() - start) % (1 / fps_limit))
@@ -1161,6 +1161,11 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 if self.fake_loading_counter < self.fake_loads_array[int(self.current_level)] and self.hl_array[int(self.current_level)]== True : 
                     # skip it
                     print("fake loading in " + str(self.current_level))
+                    # if it's snow death cutscene
+                    if int(self.current_level) == 6:
+                        # pause the timer
+                        keyboard.send(str(self.resetLineEdit.text()))
+
                 
                 # if it's a real loading screen
                 else : 
@@ -1228,6 +1233,11 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 self.fake_loading_counter = self.fake_loading_counter + 1
                 # split image number was increased, gotta decrease it now to get back on track
                 self.split_image_number = self.split_image_number - 1
+
+                # if the fake loading was from snow
+                if int(self.current_level) == 6:
+                    # resume timer (because it wasn't fake loading)
+                    keyboard.send(str(self.resetLineEdit.text()))
             else : 
                 # Resuming
                 keyboard.send(str(self.resetLineEdit.text()))
@@ -1601,14 +1611,61 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         self.split_image_directory = str(self.splitimagefolderLineEdit.text())
         # self.similarity_threshold = self.similaritythresholdDoubleSpinBox.value()
         # Forcing similarity_threshold to 95
-        self.similarity_threshold = 0.95
-        # self.comparison_index = self.comparisonmethodComboBox.currentIndex()
+        self.similarity_threshold = 0.995
+        self.comparison_index = 0
         # self.pause = self.pauseDoubleSpinBox.value()
         self.fps_limit = self.fpslimitSpinBox.value()
         self.split_key = str(self.splitLineEdit.text())
         self.reset_key = str(self.resetLineEdit.text())
         self.skip_split_key = str(self.skipsplitLineEdit.text())
         self.undo_split_key = str(self.undosplitLineEdit.text())
+
+        # self.hl_chapter_select_checkbox.isChecked()
+        if self.hl_chapter_select_checkbox.isChecked():
+            self.hl_cs_settings = 1
+        else: 
+            self.hl_cs_settings = 0
+
+        # self.hl_broken_bridge_checkbox.isChecked()
+        if self.hl_broken_bridge_checkbox.isChecked():
+            self.hl_bb_settings = 1
+        else : 
+            self.hl_bb_settings = 0
+    
+        # self.hl_pink_desert_checkbox.isChecked()
+        if self.hl_pink_desert_checkbox.isChecked():
+            self.hl_pd_settings = 1
+        else : 
+            self.hl_pd_settings = 0
+
+        # self.hl_sunken_city_checkbox.isChecked()
+        if self.hl_sunken_city_checkbox.isChecked():
+            self.hl_sc_settings = 1
+        else:
+            self.hl_sc_settings = 0
+
+        # self.hl_underground_checkbox.isChecked()
+        if self.hl_underground_checkbox.isChecked():
+            self.hl_ug_settings = 1
+        else :
+            self.hl_ug_settings = 0
+
+        # self.hl_tower_checkbox.isChecked()
+        if self.hl_tower_checkbox.isChecked():
+            self.hl_tower_settings = 1
+        else : 
+            self.hl_tower_settings = 0
+
+        # self.hl_snow_checkbox.isChecked()
+        if self.hl_snow_checkbox.isChecked() : 
+            self.hl_snow_settings = 1
+        else : 
+            self.hl_snow_settings = 0
+
+        if self.sunken_city_zen_jump_checkbox.isChecked():
+            self.sc_zen_jump_settings = 1
+        else : 
+            self.sc_zen_jump_settings = 0
 
         # if self.custompausetimesCheckBox.isChecked():
         #     self.custom_pause_times_setting = 1
@@ -1633,22 +1690,39 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         # save settings to settings.pkl
         with open('settings.pkl', 'wb') as f:
             pickle.dump(
-                [self.split_image_directory, self.similarity_threshold, self.comparison_index, self.pause,
+                [self.split_image_directory, self.similarity_threshold, 
                  self.fps_limit, self.split_key,
                  self.reset_key, self.skip_split_key, self.undo_split_key, self.x, self.y, self.width, self.height,
                  self.hwnd_title,
                  self.custom_pause_times_setting, self.custom_thresholds_setting,
-                 self.group_dummy_splits_undo_skip_setting, self.loop_setting], f)
+                 self.group_dummy_splits_undo_skip_setting, self.loop_setting, 
+                 self.hl_cs_settings, 
+                 self.hl_bb_settings, 
+                 self.hl_pd_settings, 
+                 self.hl_sc_settings, 
+                 self.hl_ug_settings, 
+                 self.hl_tower_settings, 
+                 self.hl_snow_settings,
+                 self.sc_zen_jump_settings
+                 ], f)
 
     def loadSettings(self):
         try:
             with open('settings.pkl', 'rb') as f:
-                [self.split_image_directory, self.similarity_threshold, self.comparison_index, self.pause,
+                [self.split_image_directory, self.similarity_threshold, 
                  self.fps_limit, self.split_key,
                  self.reset_key, self.skip_split_key, self.undo_split_key, self.x, self.y, self.width, self.height,
                  self.hwnd_title,
                  self.custom_pause_times_setting, self.custom_thresholds_setting,
-                 self.group_dummy_splits_undo_skip_setting, self.loop_setting] = pickle.load(f)
+                 self.group_dummy_splits_undo_skip_setting, self.loop_setting,
+                 self.hl_cs_settings, 
+                 self.hl_bb_settings, 
+                 self.hl_pd_settings, 
+                 self.hl_sc_settings, 
+                 self.hl_ug_settings, 
+                 self.hl_tower_settings, 
+                 self.hl_snow_settings,
+                 self.sc_zen_jump_settings] = pickle.load(f)
 
             self.split_image_directory = str(self.split_image_directory)
             self.splitimagefolderLineEdit.setText(self.split_image_directory)
@@ -1676,6 +1750,49 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
             #     self.customthresholdsCheckBox.setChecked(True)
             # else:
             #     self.customthresholdsCheckBox.setChecked(False)
+
+
+            self.hl_chapter_select = self.hl_chapter_select_checkbox.isChecked()
+            self.hl_broken_bridge = self.hl_broken_bridge_checkbox.isChecked()
+            self.hl_pink_desert = self.hl_pink_desert_checkbox.isChecked()
+            self.hl_sunken_city = self.hl_sunken_city_checkbox.isChecked()
+            self.hl_underground = self.hl_underground_checkbox.isChecked()
+            self.hl_tower = self.hl_tower_checkbox.isChecked()
+            self.hl_snow = self.hl_snow_checkbox.isChecked()
+
+
+            if self.hl_cs_settings == 1:
+                self.hl_chapter_select_checkbox.setChecked(True)
+                self.hl_chapter_select = True
+
+            if self.hl_bb_settings == 1: 
+                self.hl_broken_bridge_checkbox.setChecked(True)
+                self.hl_broken_bridge = True
+
+            if self.hl_pd_settings == 1 : 
+                self.hl_pink_desert_checkbox.setChecked(True)
+                self.hl_pink_desert = True
+
+            if self.hl_sc_settings == 1 : 
+                self.hl_sunken_city_checkbox.setChecked(True)
+                self.hl_sunken_city = True
+
+            if self.hl_ug_settings == 1 : 
+                self.hl_underground_checkbox.setChecked(True)
+                self.hl_underground = True
+
+            if self.hl_tower_settings  == 1 : 
+                self.hl_tower_checkbox.setChecked(True)
+                self.hl_tower = True
+
+            if self.hl_snow_settings == 1 : 
+                self.hl_snow_checkbox.setChecked(True)
+                self.hl_snow = True
+
+            if self.sc_zen_jump_settings == 1 : 
+                 self.sunken_city_zen_jump_checkbox.setChecked(True)
+                 self.sunken_city_zen_jump = True
+
 
             if self.group_dummy_splits_undo_skip_setting == 1:
                 self.groupDummySplitsCheckBox.setChecked(True)
