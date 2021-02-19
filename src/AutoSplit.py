@@ -13,6 +13,7 @@ import keyboard
 import threading
 import pickle
 import numpy as np
+import time
 
 import design
 import about
@@ -841,6 +842,10 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
 
         self.similarity_threshold = 0.995
 
+        # setting total loading time
+        self.total_loading_time = 0
+        self.loading_time_value.setText('%.3f' % self.total_loading_time)
+
         # error checking:
         if self.splitimagefolderLineEdit.text() == 'No Folder Selected':
             self.splitImageDirectoryError()
@@ -1174,6 +1179,9 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                     # Pausing
                     keyboard.send(str(self.resetLineEdit.text()))
 
+            # record current time to know how much time is spent loading
+            self.loading_time_start = time.time()
+
             # Loop until the similarity gets below the treshold
             while True : 
                 # get capture again if needed
@@ -1223,6 +1231,8 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 time.sleep((1 / fps_limit) - (time.time() - start) % (1 / fps_limit))
                 QApplication.processEvents()
 
+
+
             # Split key press
             self.waiting_for_split_delay = False
             
@@ -1243,6 +1253,12 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 keyboard.send(str(self.resetLineEdit.text()))
                 self.fake_loading_counter = 0
                 self.current_level = self.current_level + 1
+
+                # compute loading time
+                self.loading_time_end = time.time()
+                self.loading_time = self.loading_time_end - self.loading_time_start
+                self.total_loading_time = self.total_loading_time + self.loading_time
+                self.loading_time_value.setText('%.3f' % self.total_loading_time)
 
             #increase loop number if needed, set to 1 if it was the last loop.
             if self.loop_number < self.split_image_loop_amount[self.split_image_number]:
@@ -1764,34 +1780,58 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
             if self.hl_cs_settings == 1:
                 self.hl_chapter_select_checkbox.setChecked(True)
                 self.hl_chapter_select = True
+            else: 
+                self.hl_chapter_select_checkbox.setChecked(False)
+                self.hl_chapter_select = False
 
             if self.hl_bb_settings == 1: 
                 self.hl_broken_bridge_checkbox.setChecked(True)
                 self.hl_broken_bridge = True
+            else : 
+                self.hl_broken_bridge_checkbox.setChecked(False)
+                self.hl_broken_bridge = False
 
             if self.hl_pd_settings == 1 : 
                 self.hl_pink_desert_checkbox.setChecked(True)
                 self.hl_pink_desert = True
+            else :
+                self.hl_pink_desert_checkbox.setChecked(False)
+                self.hl_pink_desert = False
 
             if self.hl_sc_settings == 1 : 
                 self.hl_sunken_city_checkbox.setChecked(True)
                 self.hl_sunken_city = True
+            else:
+                self.hl_sunken_city_checkbox.setChecked(False)
+                self.hl_sunken_city = False
 
             if self.hl_ug_settings == 1 : 
                 self.hl_underground_checkbox.setChecked(True)
                 self.hl_underground = True
+            else:
+                self.hl_underground_checkbox.setChecked(False)
+                self.hl_underground = False
 
             if self.hl_tower_settings  == 1 : 
                 self.hl_tower_checkbox.setChecked(True)
                 self.hl_tower = True
+            else: 
+                self.hl_tower_checkbox.setChecked(False)
+                self.hl_tower = False
 
             if self.hl_snow_settings == 1 : 
                 self.hl_snow_checkbox.setChecked(True)
                 self.hl_snow = True
+            else:
+                self.hl_snow_checkbox.setChecked(False)
+                self.hl_snow = False
 
             if self.sc_zen_jump_settings == 1 : 
                  self.sunken_city_zen_jump_checkbox.setChecked(True)
                  self.sunken_city_zen_jump = True
+            else:
+                self.sunken_city_zen_jump_checkbox.setChecked(False)
+                self.sunken_city_zen_jump = False
 
 
             if self.group_dummy_splits_undo_skip_setting == 1:

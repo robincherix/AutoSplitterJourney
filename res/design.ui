@@ -1111,13 +1111,61 @@
      </rect>
     </property>
     <property name="text">
-     <string>Watch Sunken City history lesson</string>
+     <string>Watch Underground history lesson</string>
     </property>
     <property name="checked">
      <bool>true</bool>
     </property>
     <property name="tristate">
      <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="loading_time_label">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>300</y>
+      <width>111</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="locale">
+     <locale language="English" country="Switzerland"/>
+    </property>
+    <property name="text">
+     <string>Total Loading Time</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="loading_time_value">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>320</y>
+      <width>81</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="mouseTracking">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>0</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="seconds_label">
+    <property name="geometry">
+     <rect>
+      <x>590</x>
+      <y>320</y>
+      <width>16</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>[s]</string>
     </property>
    </widget>
    <zorder>splitimagefolderLabel</zorder>
@@ -1184,6 +1232,9 @@
    <zorder>hl_tower_checkbox</zorder>
    <zorder>hl_snow_checkbox</zorder>
    <zorder>hl_underground_checkbox</zorder>
+   <zorder>loading_time_label</zorder>
+   <zorder>loading_time_value</zorder>
+   <zorder>seconds_label</zorder>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
