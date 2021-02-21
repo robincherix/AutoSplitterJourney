@@ -736,6 +736,10 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
 
         self.updateSplitImage()
 
+        self.current_level = self.current_level - 1 
+        self.loading_times[self.current_level] = 0
+        self.loading_time_values[self.current_level].setText('%.3f' % self.loading_times[self.current_level])
+
         return
 
     # skip split button and hotkey connect to here
@@ -756,6 +760,8 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
             self.loop_number = 1
 
         self.updateSplitImage()
+
+        self.current_level = self.current_level + 1
 
         return
 
@@ -840,7 +846,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         # Fake loading screen counter
         self.fake_loading_counter = 0
 
-        self.similarity_threshold = 0.9999
+        self.similarity_threshold = 0.99
 
         # setting total loading time
         self.total_loading_time = 0
@@ -1206,6 +1212,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                     if int(self.current_level) == 6:
                         # pause the timer
                         keyboard.send(str(self.resetLineEdit.text()))
+                        self.loading_time_start = time.time()
 
                 
                 # if it's a real loading screen
@@ -1284,6 +1291,12 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 if int(self.current_level) == 6:
                     # resume timer (because it wasn't fake loading)
                     keyboard.send(str(self.resetLineEdit.text()))
+                    self.loading_time_end = time.time()
+                    self.loading_time = self.loading_time_end - self.loading_time_start
+                    self.total_loading_time = self.total_loading_time + self.loading_time
+                    self.loading_time_value.setText('%.3f' % self.total_loading_time)
+                    self.loading_times[self.current_level] = self.loading_time
+                    self.loading_time_values[self.current_level].setText('%.3f' % self.loading_time)
             else : 
                 # Resuming
                 keyboard.send(str(self.resetLineEdit.text()))
@@ -1295,8 +1308,8 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 self.loading_time = self.loading_time_end - self.loading_time_start
                 self.total_loading_time = self.total_loading_time + self.loading_time
                 self.loading_time_value.setText('%.3f' % self.total_loading_time)
-                self.loading_times[self.current_level - 1] = self.loading_time
-                self.loading_time_values[self.current_level - 1].setText('%.3f' % self.loading_time)
+                self.loading_times[self.current_level - 1] = self.loading_times[self.current_level - 1] + self.loading_time
+                self.loading_time_values[self.current_level - 1].setText('%.3f' % self.loading_times[self.current_level - 1])
 
 
             #increase loop number if needed, set to 1 if it was the last loop.
@@ -1408,7 +1421,8 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         QApplication.processEvents()
 
     def compareImage(self, image, mask, capture):
-        return compare.compare_histograms(image, capture)
+        # return compare.compare_histograms(image, capture)
+        return compare.compare_l2_norm(image, capture)
         # if mask is None:
         #     if self.comparisonmethodComboBox.currentIndex() == 0:
         #         return compare.compare_l2_norm(image, capture)
@@ -1666,7 +1680,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         self.split_image_directory = str(self.splitimagefolderLineEdit.text())
         # self.similarity_threshold = self.similaritythresholdDoubleSpinBox.value()
         # Forcing similarity_threshold to 95
-        self.similarity_threshold = 0.9999
+        self.similarity_threshold = 0.99
         self.comparison_index = 0
         # self.pause = self.pauseDoubleSpinBox.value()
         self.fps_limit = self.fpslimitSpinBox.value()
