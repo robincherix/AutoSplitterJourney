@@ -840,11 +840,47 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         # Fake loading screen counter
         self.fake_loading_counter = 0
 
-        self.similarity_threshold = 0.995
+        self.similarity_threshold = 0.9999
 
         # setting total loading time
         self.total_loading_time = 0
         self.loading_time_value.setText('%.3f' % self.total_loading_time)
+
+        self.loading_time_bb = 0
+        self.loading_time_pd = 0
+        self.loading_time_sc = 0
+        self.loading_time_ug = 0
+        self.loading_time_tower = 0
+        self.loading_time_snow = 0
+        self.loading_time_paradise = 0
+
+        self.loading_time_bb_value.setText('%.3f' % self.loading_time_bb)
+        self.loading_time_pd_value.setText('%.3f' % self.loading_time_pd)
+        self.loading_time_sc_value.setText('%.3f' % self.loading_time_sc)
+        self.loading_time_ug_value.setText('%.3f' % self.loading_time_ug)
+        self.loading_time_tower_value.setText('%.3f' % self.loading_time_tower)
+        self.loading_time_snow_value.setText('%.3f' % self.loading_time_snow)
+        self.loading_time_paradise_value.setText('%.3f' % self.loading_time_paradise)
+
+        self.loading_times = [
+            self.loading_time_bb,
+            self.loading_time_pd,
+            self.loading_time_sc,
+            self.loading_time_ug,
+            self.loading_time_tower,
+            self.loading_time_snow,
+            self.loading_time_paradise
+        ]
+
+        self.loading_time_values = [
+            self.loading_time_bb_value,
+            self.loading_time_pd_value,
+            self.loading_time_sc_value,
+            self.loading_time_ug_value,
+            self.loading_time_tower_value,
+            self.loading_time_snow_value,
+            self.loading_time_paradise_value
+        ]
 
         # error checking:
         if self.splitimagefolderLineEdit.text() == 'No Folder Selected':
@@ -1259,6 +1295,9 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 self.loading_time = self.loading_time_end - self.loading_time_start
                 self.total_loading_time = self.total_loading_time + self.loading_time
                 self.loading_time_value.setText('%.3f' % self.total_loading_time)
+                self.loading_times[self.current_level - 1] = self.loading_time
+                self.loading_time_values[self.current_level - 1].setText('%.3f' % self.loading_time)
+
 
             #increase loop number if needed, set to 1 if it was the last loop.
             if self.loop_number < self.split_image_loop_amount[self.split_image_number]:
@@ -1627,7 +1666,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         self.split_image_directory = str(self.splitimagefolderLineEdit.text())
         # self.similarity_threshold = self.similaritythresholdDoubleSpinBox.value()
         # Forcing similarity_threshold to 95
-        self.similarity_threshold = 0.995
+        self.similarity_threshold = 0.9999
         self.comparison_index = 0
         # self.pause = self.pauseDoubleSpinBox.value()
         self.fps_limit = self.fpslimitSpinBox.value()
