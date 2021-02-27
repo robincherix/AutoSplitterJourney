@@ -1041,9 +1041,6 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
             time.sleep((1 / fps_limit) - (time.time() - start) % (1 / fps_limit))
             QApplication.processEvents()
 
-        # print(np.std(capture))
-        # print(np.mean(capture))
-
         # Second loop to wait until the game starts to appear
         capture = self.getCaptureForComparison(False)
         while True:
@@ -1056,13 +1053,17 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
             time.sleep((1 / fps_limit) - (time.time() - start) % (1 / fps_limit))
             QApplication.processEvents()
 
-
-        print(np.std(capture))
-        print(np.mean(capture))
-
         ###########  END OF ADDED SECTION #################################
         # Resuming timer after reset screen
         keyboard.send(str(self.resetLineEdit.text()))
+
+        # Add the loading time
+        self.loading_time = (time.time() - start)
+        self.total_loading_time = self.total_loading_time + self.loading_time
+        self.loading_time_value.setText('%.3f' % self.total_loading_time)
+        self.loading_time_reset_value.setText('%.3f' % self.loading_time)
+
+        self.must_double_break = False
 
         # First while loop: stays in this loop until all of the split images have been split
         while self.split_image_number < self.number_of_split_images:
@@ -1180,6 +1181,11 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                     if self.waiting_for_split_delay == False and self.similarity >= self.similarity_threshold:
                         break
 
+                    # if split key was manually pressed go to next split
+                    if keyboard.is_pressed(str(self.split_key)):
+                        self.must_double_break = True
+                        break
+
                 # limit the number of time the comparison runs to reduce cpu usage
                 fps_limit = self.fpslimitSpinBox.value()
                 time.sleep((1 / fps_limit) - (time.time() - start) % (1 / fps_limit))
@@ -1247,7 +1253,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 self.waiting_for_split_delay = False
 
                 # if we detect this screen is a fake loading screen 
-                if self.fake_loading_counter < self.fake_loads_array[int(self.current_level)] and self.hl_array[int(self.current_level)]== True : 
+                if self.fake_loading_counter < self.fake_loads_array[int(self.current_level)] and self.hl_array[int(self.current_level)]== True and self.must_double_break is False : 
                     # skip it
                     print("fake loading in " + str(self.current_level))
                     # if it's snow death cutscene
@@ -1259,16 +1265,20 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 
                 # if it's a real loading screen
                 else : 
-                    # Splitting
-                    keyboard.send(str(self.splitLineEdit.text()))
-                    # Pausing
-                    keyboard.send(str(self.resetLineEdit.text()))
+                    if self.must_double_break == False:
+                        # Splitting
+                        keyboard.send(str(self.splitLineEdit.text()))
+                        # Pausing
+                        keyboard.send(str(self.resetLineEdit.text()))
 
             # record current time to know how much time is spent loading
             self.loading_time_start = time.time()
 
             # Loop until the similarity gets below the treshold
             while True : 
+                if self.must_double_break == True: 
+                    break
+
                 # get capture again if needed
                 masked = (self.flags & 0x02 == 0x02)
                 if capture is None or masked != reset_masked:
@@ -1330,7 +1340,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 self.split_image_number = self.split_image_number - 1
 
                 # if the fake loading was from snow
-                if int(self.current_level) == 6:
+                if int(self.current_level) == 6 and self.must_double_break == False:
                     # resume timer (because it wasn't fake loading)
                     keyboard.send(str(self.resetLineEdit.text()))
                     self.loading_time_end = time.time()
@@ -1341,7 +1351,8 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                     self.loading_time_values[self.current_level].setText('%.3f' % self.loading_time)
             else : 
                 # Resuming
-                keyboard.send(str(self.resetLineEdit.text()))
+                if self.must_double_break == False:
+                    keyboard.send(str(self.resetLineEdit.text()))
                 self.fake_loading_counter = 0
                 self.current_level = self.current_level + 1
 
@@ -1353,7 +1364,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 self.loading_times[self.current_level - 1] = self.loading_times[self.current_level - 1] + self.loading_time
                 self.loading_time_values[self.current_level - 1].setText('%.3f' % self.loading_times[self.current_level - 1])
 
-
+            self.must_double_break = False
             #increase loop number if needed, set to 1 if it was the last loop.
             if self.loop_number < self.split_image_loop_amount[self.split_image_number]:
                 self.loop_number = self.loop_number + 1
@@ -1364,12 +1375,12 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
             # else if current loop amount is back to 1, add 1 to split image number
             # else pass, dont change split image number.
             # if self.loopCheckBox.isChecked() and self.split_image_number == self.number_of_split_images - 1 and self.loop_number == 1:
-            if self.split_image_number == self.number_of_split_images - 1 and self.loop_number == 1:
-                self.split_image_number = 0
-            elif self.loop_number == 1:
-                self.split_image_number = self.split_image_number + 1
-            else:
-                pass
+            # if self.split_image_number == self.number_of_split_images - 1 and self.loop_number == 1:
+            #     self.split_image_number = 0
+            # elif self.loop_number == 1:
+            self.split_image_number = self.split_image_number + 1
+            # else:
+            #     pass
 
             # set a "pause" split image number. This is done so that it can detect if user hit split/undo split while paused.
             pause_split_image_number = self.split_image_number
@@ -1440,6 +1451,20 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                             continue
 
                     QTest.qWait(1)
+
+        self.run_end_time = time.time()
+        self.real_time = self.run_end_time - self.run_start_time
+        self.in_game_time = self.real_time - self.total_loading_time
+        
+        minutes = int(self.real_time / 60)
+        seconds = int(self.real_time % 60)
+        milliseconds = self.real_time - int(self.real_time)
+        self.real_time_value.setText(str(minutes)+":"+str(seconds)+str(milliseconds)[1:5])
+        
+        minutes = int(self.in_game_time / 60)
+        seconds = int(self.in_game_time % 60)
+        milliseconds = self.in_game_time - int(self.in_game_time)
+        self.real_time_value_2.setText(str(minutes)+":"+str(seconds)+str(milliseconds)[1:5])
 
         # loop breaks to here when the last image splits
         self.startautosplitterButton.setText('Start Auto Splitter')
