@@ -788,6 +788,9 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         self.undoSplitSignal.emit()
 
     def autoSplitter(self):
+        # Pausing timer immediately to wait for reset screen
+        keyboard.send(str(self.resetLineEdit.text()))
+
         # Init with checkboxes value
         # Which HL are watched during the run
         self.hl_chapter_select = self.hl_chapter_select_checkbox.isChecked()
@@ -901,7 +904,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
 
 
         # Sleeping here to prevent white flashing that can occur on PC
-        time.sleep(2)
+        # time.sleep(2)
 
         # Make sure that each of the images follows the guidelines for correct format
         # according to all of the settings selected by the user.
@@ -1022,6 +1025,44 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         self.split_below_threshold = False
 
         self.run_start_time = time.time()
+        start = time.time()
+        ############### ADDED SECTION TO WAIT FOR GAME RESET #########################
+        
+        # Setting a threshold for standard deviation to detect mostly uniform images
+        self.deviation_threshold = 0.1
+        # Also setting a threshold for mean value of pixels to prevent false positive from PC white flashing
+        self.mean_threshold = 100
+        capture = self.getCaptureForComparison(False)
+        # A first loop to wait for a mostly uniform image using standard deviation
+        while np.std(capture) > self.deviation_threshold:
+            capture = self.getCaptureForComparison(False)
+            # limit the number of time the comparison runs to reduce cpu usage
+            fps_limit = self.fpslimitSpinBox.value()
+            time.sleep((1 / fps_limit) - (time.time() - start) % (1 / fps_limit))
+            QApplication.processEvents()
+
+        # print(np.std(capture))
+        # print(np.mean(capture))
+
+        # Second loop to wait until the game starts to appear
+        capture = self.getCaptureForComparison(False)
+        while True:
+            capture = self.getCaptureForComparison(False)
+            # if deviation is bigger than threshold and the screen isn't white
+            if np.std(capture) > self.deviation_threshold and np.mean(capture) < self.mean_threshold:
+                break
+            # limit the number of time the comparison runs to reduce cpu usage
+            fps_limit = self.fpslimitSpinBox.value()
+            time.sleep((1 / fps_limit) - (time.time() - start) % (1 / fps_limit))
+            QApplication.processEvents()
+
+
+        print(np.std(capture))
+        print(np.mean(capture))
+
+        ###########  END OF ADDED SECTION #################################
+        # Resuming timer after reset screen
+        keyboard.send(str(self.resetLineEdit.text()))
 
         # First while loop: stays in this loop until all of the split images have been split
         while self.split_image_number < self.number_of_split_images:
@@ -1037,7 +1078,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
 
             # second while loop: stays in this loop until similarity threshold is met
             # skip loop if we just finished waiting for the split delay and need to press the split key!
-            start = time.time()
+            
             while True:
 
                 # I have a pause loop here so that it can check if the user presses skip split, undo split, or reset here.
@@ -1092,6 +1133,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 masked = (self.flags & 0x02 == 0x02)
                 if capture is None or masked != reset_masked:
                     capture = self.getCaptureForComparison(masked)
+
 
                 # calculate similarity for split image
                 self.similarity = self.compareImage(self.split_image, self.mask, capture)
@@ -1679,7 +1721,7 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         self.height = self.heightSpinBox.value()
         self.split_image_directory = str(self.splitimagefolderLineEdit.text())
         # self.similarity_threshold = self.similaritythresholdDoubleSpinBox.value()
-        # Forcing similarity_threshold to 95
+        # Forcing similarity_threshold to 0.99
         self.similarity_threshold = 0.99
         self.comparison_index = 0
         # self.pause = self.pauseDoubleSpinBox.value()
