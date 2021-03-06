@@ -1357,12 +1357,13 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
                 self.current_level = self.current_level + 1
 
                 # compute loading time
-                self.loading_time_end = time.time()
-                self.loading_time = self.loading_time_end - self.loading_time_start
-                self.total_loading_time = self.total_loading_time + self.loading_time
-                self.loading_time_value.setText('%.3f' % self.total_loading_time)
-                self.loading_times[self.current_level - 1] = self.loading_times[self.current_level - 1] + self.loading_time
-                self.loading_time_values[self.current_level - 1].setText('%.3f' % self.loading_times[self.current_level - 1])
+                if self.must_double_break == False:
+                    self.loading_time_end = time.time()
+                    self.loading_time = self.loading_time_end - self.loading_time_start
+                    self.total_loading_time = self.total_loading_time + self.loading_time
+                    self.loading_time_value.setText('%.3f' % self.total_loading_time)
+                    self.loading_times[self.current_level - 1] = self.loading_times[self.current_level - 1] + self.loading_time
+                    self.loading_time_values[self.current_level - 1].setText('%.3f' % self.loading_times[self.current_level - 1])
 
             self.must_double_break = False
             #increase loop number if needed, set to 1 if it was the last loop.
@@ -1458,13 +1459,21 @@ class AutoSplit(QMainWindow, design.Ui_MainWindow):
         
         minutes = int(self.real_time / 60)
         seconds = int(self.real_time % 60)
+        if seconds < 10 :
+            seconds = '0'+str(seconds)
+        else : 
+            seconds = str(seconds)
         milliseconds = self.real_time - int(self.real_time)
-        self.real_time_value.setText(str(minutes)+":"+str(seconds)+str(milliseconds)[1:5])
+        self.real_time_value.setText(str(minutes)+":"+seconds+str(milliseconds)[1:5])
         
         minutes = int(self.in_game_time / 60)
         seconds = int(self.in_game_time % 60)
+        if seconds < 10 :
+            seconds = '0'+str(seconds)
+        else : 
+            seconds = str(seconds)
         milliseconds = self.in_game_time - int(self.in_game_time)
-        self.real_time_value_2.setText(str(minutes)+":"+str(seconds)+str(milliseconds)[1:5])
+        self.real_time_value_2.setText(str(minutes)+":"+seconds+str(milliseconds)[1:5])
 
         # loop breaks to here when the last image splits
         self.startautosplitterButton.setText('Start Auto Splitter')
